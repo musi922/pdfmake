@@ -1,0 +1,3 @@
+### Get all Foerderprogramme
+GET http://localhost:4004/steckbrief/Foerderprogramme
+Accept: application/json

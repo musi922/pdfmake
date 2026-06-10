@@ -1,0 +1,8 @@
+GET http://localhost:4004/odata/v2/steckbrief/Foerderprogramme
+Accept: application/json
+
+### generate pdf
+POST http://localhost:4004/odata/v2/steckbrief/Foerderprogramme(ID=a281457d-2380-4af8-95bd-da604ddea135,IsActiveEntity=true)/SteckbriefService.generatePDF
+Content-Type: application/json
+
+{}

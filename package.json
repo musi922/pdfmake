@@ -1,0 +1,44 @@
+{
+  "name": "steckbrief",
+  "version": "1.0.0",
+  "description": "CAP Steckbrief Förderprogramm",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch": "cds watch",
+    "build": "cds build",
+    "watch-steckbrief-ui": "cds watch --open de.foerderung.steckbriefui/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-project1": "cds watch --open project1/index.html?sap-ui-xx-viewCache=false --livereload false"
+  },
+  "dependencies": {
+    "@cap-js-community/odata-v2-adapter": "^1.15.12",
+    "@sap-cloud-sdk/http-client": "^4.7.0",
+    "@sap/cds": "^8",
+    "@sap/cds-dk": "^8",
+    "express": "^4",
+    "pdfmake": "^0.2.23"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^1",
+    "cds-plugin-ui5": "^0.13.0"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "database": ":memory:"
+        }
+      }
+    }
+  },
+  "workspaces": [
+    "app/*"
+  ],
+  "sapux": [
+    "app/steckbrief-ui",
+    "app/project1"
+  ]
+}

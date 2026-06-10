@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+  <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+    <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+    <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
+    <edmx:Include Alias="UI" Namespace="com.sap.vocabularies.UI.v1"/>
+  </edmx:Reference>
+  <edmx:DataServices>
+    <Schema Namespace="SteckbriefService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+      <Annotation Term="Core.Links">
+        <Collection>
+          <Record>
+            <PropertyValue Property="rel" String="author"/>
+            <PropertyValue Property="href" String="https://cap.cloud.sap"/>
+          </Record>
+        </Collection>
+      </Annotation>
+      <EntityContainer Name="EntityContainer">
+        <EntitySet Name="Foerderprogramme" EntityType="SteckbriefService.Foerderprogramme">
+          <NavigationPropertyBinding Path="finanzpositionen" Target="Finanzpositionen"/>
+          <NavigationPropertyBinding Path="SiblingEntity" Target="Foerderprogramme"/>
+        </EntitySet>
+        <EntitySet Name="Finanzpositionen" EntityType="SteckbriefService.Finanzpositionen">
+          <NavigationPropertyBinding Path="foerderprogramm" Target="Foerderprogramme"/>
+          <NavigationPropertyBinding Path="SiblingEntity" Target="Finanzpositionen"/>
+        </EntitySet>
+      </EntityContainer>
+      <EntityType Name="Foerderprogramme">
+        <Key>
+          <PropertyRef Name="ID"/>
+          <PropertyRef Name="IsActiveEntity"/>
+        </Key>
+        <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+        <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+        <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+        <Property Name="nummer" Type="Edm.String" MaxLength="20"/>
+        <Property Name="bezeichnungLang" Type="Edm.String" MaxLength="200"/>
+        <Property Name="bezeichnungKurz" Type="Edm.String" MaxLength="100"/>
+        <Property Name="stand" Type="Edm.Date"/>
+        <Property Name="ressort" Type="Edm.String" MaxLength="50"/>
+        <Property Name="fachbereich" Type="Edm.String" MaxLength="100"/>
+        <Property Name="inhalt" Type="Edm.String"/>
+        <Property Name="rechtsgrundlage" Type="Edm.String"/>
+        <Property Name="adressat" Type="Edm.String" MaxLength="300"/>
+        <Property Name="zielsetzung" Type="Edm.String"/>
+        <Property Name="leistungsgrund" Type="Edm.String" MaxLength="100"/>
+        <Property Name="mittelherkunft" Type="Edm.String" MaxLength="100"/>
+        <Property Name="bewilligungBeginn" Type="Edm.Int32"/>
+        <Property Name="bewilligungEnde" Type="Edm.String" MaxLength="20"/>
+        <Property Name="foerderfrequenz" Type="Edm.String" MaxLength="50"/>
+        <Property Name="finanzierungsart" Type="Edm.String" MaxLength="100"/>
+        <Property Name="foerderForm" Type="Edm.String" MaxLength="50"/>
+        <Property Name="foerderArt" Type="Edm.String" MaxLength="50"/>
+        <Property Name="evaluationDurchgef" Type="Edm.Boolean" DefaultValue="false"/>
+        <NavigationProperty Name="finanzpositionen" Type="Collection(SteckbriefService.Finanzpositionen)" Partner="foerderprogramm">
+          <OnDelete Action="Cascade"/>
+        </NavigationProperty>
+        <Property Name="IsActiveEntity" Type="Edm.Boolean" Nullable="false" DefaultValue="true"/>
+        <Property Name="HasActiveEntity" Type="Edm.Boolean" Nullable="false" DefaultValue="false"/>
+        <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false" DefaultValue="false"/>
+        <NavigationProperty Name="DraftAdministrativeData" Type="SteckbriefService.DraftAdministrativeData" ContainsTarget="true"/>
+        <NavigationProperty Name="SiblingEntity" Type="SteckbriefService.Foerderprogramme"/>
+      </EntityType>
+      <EntityType Name="Finanzpositionen">
+        <Key>
+          <PropertyRef Name="ID"/>
+          <PropertyRef Name="IsActiveEntity"/>
+        </Key>
+        <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+        <NavigationProperty Name="foerderprogramm" Type="SteckbriefService.Foerderprogramme" Partner="finanzpositionen">
+          <ReferentialConstraint Property="foerderprogramm_ID" ReferencedProperty="ID"/>
+        </NavigationProperty>
+        <Property Name="foerderprogramm_ID" Type="Edm.Guid"/>
+        <Property Name="nummer" Type="Edm.String" MaxLength="30"/>
+        <Property Name="bezeichnung" Type="Edm.String" MaxLength="300"/>
+        <Property Name="IsActiveEntity" Type="Edm.Boolean" Nullable="false" DefaultValue="true"/>
+        <Property Name="HasActiveEntity" Type="Edm.Boolean" Nullable="false" DefaultValue="false"/>
+        <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false" DefaultValue="false"/>
+        <NavigationProperty Name="DraftAdministrativeData" Type="SteckbriefService.DraftAdministrativeData" ContainsTarget="true"/>
+        <NavigationProperty Name="SiblingEntity" Type="SteckbriefService.Finanzpositionen"/>
+      </EntityType>
+      <EntityType Name="DraftAdministrativeData">
+        <Key>
+          <PropertyRef Name="DraftUUID"/>
+        </Key>
+        <Property Name="DraftUUID" Type="Edm.Guid" Nullable="false"/>
+        <Property Name="CreationDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="CreatedByUser" Type="Edm.String" MaxLength="256"/>
+        <Property Name="DraftIsCreatedByMe" Type="Edm.Boolean"/>
+        <Property Name="LastChangeDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="LastChangedByUser" Type="Edm.String" MaxLength="256"/>
+        <Property Name="InProcessByUser" Type="Edm.String" MaxLength="256"/>
+        <Property Name="DraftIsProcessedByMe" Type="Edm.Boolean"/>
+      </EntityType>
+      <Action Name="generatePDF" IsBound="true">
+        <Parameter Name="in" Type="SteckbriefService.Foerderprogramme"/>
+        <ReturnType Type="Edm.Binary"/>
+      </Action>
+      <Action Name="draftPrepare" IsBound="true" EntitySetPath="in">
+        <Parameter Name="in" Type="SteckbriefService.Foerderprogramme"/>
+        <Parameter Name="SideEffectsQualifier" Type="Edm.String"/>
+        <ReturnType Type="SteckbriefService.Foerderprogramme"/>
+      </Action>
+      <Action Name="draftPrepare" IsBound="true" EntitySetPath="in">
+        <Parameter Name="in" Type="SteckbriefService.Finanzpositionen"/>
+        <Parameter Name="SideEffectsQualifier" Type="Edm.String"/>
+        <ReturnType Type="SteckbriefService.Finanzpositionen"/>
+      </Action>
+      <Action Name="draftActivate" IsBound="true" EntitySetPath="in">
+        <Parameter Name="in" Type="SteckbriefService.Foerderprogramme"/>
+        <ReturnType Type="SteckbriefService.Foerderprogramme"/>
+      </Action>
+      <Action Name="draftEdit" IsBound="true" EntitySetPath="in">
+        <Parameter Name="in" Type="SteckbriefService.Foerderprogramme"/>
+        <Parameter Name="PreserveChanges" Type="Edm.Boolean"/>
+        <ReturnType Type="SteckbriefService.Foerderprogramme"/>
+      </Action>
+      <Annotations Target="SteckbriefService.Foerderprogramme">
+        <Annotation Term="UI.SelectionFields">
+          <Collection>
+            <PropertyPath>nummer</PropertyPath>
+            <PropertyPath>ressort</PropertyPath>
+            <PropertyPath>fachbereich</PropertyPath>
+            <PropertyPath>stand</PropertyPath>
+          </Collection>
+        </Annotation>
+        <Annotation Term="UI.LineItem">
+          <Collection>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Label" String="Nummer"/>
+              <PropertyValue Property="Value" Path="nummer"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Label" String="Kurzbezeichnung"/>
+              <PropertyValue Property="Value" Path="bezeichnungKurz"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Label" String="Ressort"/>
+              <PropertyValue Property="Value" Path="ressort"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Label" String="Stand"/>
+              <PropertyValue Property="Value" Path="stand"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Label" String="Fachbereich"/>
+              <PropertyValue Property="Value" Path="fachbereich"/>
+            </Record>
+            <Record Type="UI.DataFieldForAction">
+              <PropertyValue Property="Action" String="SteckbriefService.Foerderprogramme/SteckbriefService.generatePDF"/>
+              <PropertyValue Property="Label" String="PDF generieren"/>
+              <PropertyValue Property="Inline" Bool="true"/>
+            </Record>
+          </Collection>
+        </Annotation>
+        <Annotation Term="UI.HeaderInfo">
+          <Record Type="UI.HeaderInfoType">
+            <PropertyValue Property="TypeName" String="Förderprogramm"/>
+            <PropertyValue Property="TypeNamePlural" String="Förderprogramme"/>
+            <PropertyValue Property="Title">
+              <Record Type="UI.DataField">
+                <PropertyValue Property="Value" Path="bezeichnungLang"/>
+              </Record>
+            </PropertyValue>
+            <PropertyValue Property="Description">
+              <Record Type="UI.DataField">
+                <PropertyValue Property="Value" Path="nummer"/>
+              </Record>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="UI.HeaderFacets">
+          <Collection>
+            <Record Type="UI.ReferenceFacet">
+              <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#Header"/>
+            </Record>
+          </Collection>
+        </Annotation>
+        <Annotation Term="UI.FieldGroup" Qualifier="Header">
+          <Record Type="UI.FieldGroupType">
+            <PropertyValue Property="Data">
+              <Collection>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Kurzbezeichnung"/>
+                  <PropertyValue Property="Value" Path="bezeichnungKurz"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Ressort"/>
+                  <PropertyValue Property="Value" Path="ressort"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Fachbereich"/>
+                  <PropertyValue Property="Value" Path="fachbereich"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Stand"/>
+                  <PropertyValue Property="Value" Path="stand"/>
+                </Record>
+              </Collection>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="UI.Identification">
+          <Collection>
+            <Record Type="UI.DataFieldForAction">
+              <PropertyValue Property="Action" String="SteckbriefService.Foerderprogramme/SteckbriefService.generatePDF"/>
+              <PropertyValue Property="Label" String="PDF generieren"/>
+            </Record>
+          </Collection>
+        </Annotation>
+        <Annotation Term="UI.Facets">
+          <Collection>
+            <Record Type="UI.ReferenceFacet">
+              <PropertyValue Property="ID" String="Grunddaten"/>
+              <PropertyValue Property="Label" String="Grunddaten"/>
+              <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#Grunddaten"/>
+            </Record>
+            <Record Type="UI.ReferenceFacet">
+              <PropertyValue Property="ID" String="Handlungsfelder"/>
+              <PropertyValue Property="Label" String="Handlungsfelder"/>
+              <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#Handlungsfelder"/>
+            </Record>
+            <Record Type="UI.ReferenceFacet">
+              <PropertyValue Property="ID" String="WeitereInfos"/>
+              <PropertyValue Property="Label" String="Weitere Informationen"/>
+              <PropertyValue Property="Target" AnnotationPath="@UI.FieldGroup#WeitereInfos"/>
+            </Record>
+            <Record Type="UI.ReferenceFacet">
+              <PropertyValue Property="ID" String="Finanzpositionen"/>
+              <PropertyValue Property="Label" String="Finanzpositionen"/>
+              <PropertyValue Property="Target" AnnotationPath="finanzpositionen/@UI.LineItem"/>
+            </Record>
+          </Collection>
+        </Annotation>
+        <Annotation Term="UI.FieldGroup" Qualifier="Grunddaten">
+          <Record Type="UI.FieldGroupType">
+            <PropertyValue Property="Data">
+              <Collection>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Nummer"/>
+                  <PropertyValue Property="Value" Path="nummer"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Bezeichnung (lang)"/>
+                  <PropertyValue Property="Value" Path="bezeichnungLang"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Bezeichnung (kurz)"/>
+                  <PropertyValue Property="Value" Path="bezeichnungKurz"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Stand"/>
+                  <PropertyValue Property="Value" Path="stand"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Ressort"/>
+                  <PropertyValue Property="Value" Path="ressort"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Fachbereich"/>
+                  <PropertyValue Property="Value" Path="fachbereich"/>
+                </Record>
+              </Collection>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="UI.FieldGroup" Qualifier="Handlungsfelder">
+          <Record Type="UI.FieldGroupType">
+            <PropertyValue Property="Data">
+              <Collection>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Inhalt"/>
+                  <PropertyValue Property="Value" Path="inhalt"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Rechtsgrundlage"/>
+                  <PropertyValue Property="Value" Path="rechtsgrundlage"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Adressat"/>
+                  <PropertyValue Property="Value" Path="adressat"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Zielsetzung"/>
+                  <PropertyValue Property="Value" Path="zielsetzung"/>
+                </Record>
+              </Collection>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="UI.FieldGroup" Qualifier="WeitereInfos">
+          <Record Type="UI.FieldGroupType">
+            <PropertyValue Property="Data">
+              <Collection>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Leistungsgrund"/>
+                  <PropertyValue Property="Value" Path="leistungsgrund"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Mittelherkunft"/>
+                  <PropertyValue Property="Value" Path="mittelherkunft"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Bewilligung Beginn"/>
+                  <PropertyValue Property="Value" Path="bewilligungBeginn"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Bewilligung Ende"/>
+                  <PropertyValue Property="Value" Path="bewilligungEnde"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Förderfrequenz"/>
+                  <PropertyValue Property="Value" Path="foerderfrequenz"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Finanzierungsart"/>
+                  <PropertyValue Property="Value" Path="finanzierungsart"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Form der Förderung"/>
+                  <PropertyValue Property="Value" Path="foerderForm"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Art der Förderung"/>
+                  <PropertyValue Property="Value" Path="foerderArt"/>
+                </Record>
+                <Record Type="UI.DataField">
+                  <PropertyValue Property="Label" String="Evaluation durchgef.?"/>
+                  <PropertyValue Property="Value" Path="evaluationDurchgef"/>
+                </Record>
+              </Collection>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SteckbriefService.EntityContainer/Foerderprogramme">
+        <Annotation Term="Common.DraftRoot">
+          <Record Type="Common.DraftRootType">
+            <PropertyValue Property="ActivationAction" String="SteckbriefService.draftActivate"/>
+            <PropertyValue Property="EditAction" String="SteckbriefService.draftEdit"/>
+            <PropertyValue Property="PreparationAction" String="SteckbriefService.draftPrepare"/>
+          </Record>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Foerderprogramme/createdAt">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Immutable" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>CreatedAt}"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Foerderprogramme/createdBy">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Immutable" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+        <Annotation Term="Common.Label" String="{i18n>CreatedBy}"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Foerderprogramme/modifiedAt">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>ChangedAt}"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Foerderprogramme/modifiedBy">
+        <Annotation Term="UI.HiddenFilter" Bool="true"/>
+        <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+        <Annotation Term="Core.Computed" Bool="true"/>
+        <Annotation Term="Core.Description" String="{i18n>UserID.Description}"/>
+        <Annotation Term="Common.Label" String="{i18n>ChangedBy}"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Foerderprogramme/ID">
+        <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Foerderprogramme/IsActiveEntity">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Foerderprogramme/HasActiveEntity">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Foerderprogramme/HasDraftEntity">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Foerderprogramme/DraftAdministrativeData">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Finanzpositionen">
+        <Annotation Term="UI.LineItem">
+          <Collection>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Label" String="Nummer"/>
+              <PropertyValue Property="Value" Path="nummer"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Label" String="Bezeichnung"/>
+              <PropertyValue Property="Value" Path="bezeichnung"/>
+            </Record>
+          </Collection>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SteckbriefService.EntityContainer/Finanzpositionen">
+        <Annotation Term="Common.DraftNode">
+          <Record Type="Common.DraftNodeType">
+            <PropertyValue Property="PreparationAction" String="SteckbriefService.draftPrepare"/>
+          </Record>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Finanzpositionen/ID">
+        <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Finanzpositionen/IsActiveEntity">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Finanzpositionen/HasActiveEntity">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Finanzpositionen/HasDraftEntity">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.Finanzpositionen/DraftAdministrativeData">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.DraftAdministrativeData">
+        <Annotation Term="Common.Label" String="{i18n>Draft_DraftAdministrativeData}"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.DraftAdministrativeData/DraftUUID">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>Draft_DraftUUID}"/>
+        <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.DraftAdministrativeData/CreationDateTime">
+        <Annotation Term="Common.Label" String="{i18n>Draft_CreationDateTime}"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.DraftAdministrativeData/CreatedByUser">
+        <Annotation Term="Common.Label" String="{i18n>Draft_CreatedByUser}"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.DraftAdministrativeData/DraftIsCreatedByMe">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>Draft_DraftIsCreatedByMe}"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.DraftAdministrativeData/LastChangeDateTime">
+        <Annotation Term="Common.Label" String="{i18n>Draft_LastChangeDateTime}"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.DraftAdministrativeData/LastChangedByUser">
+        <Annotation Term="Common.Label" String="{i18n>Draft_LastChangedByUser}"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.DraftAdministrativeData/InProcessByUser">
+        <Annotation Term="Common.Label" String="{i18n>Draft_InProcessByUser}"/>
+      </Annotations>
+      <Annotations Target="SteckbriefService.DraftAdministrativeData/DraftIsProcessedByMe">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>Draft_DraftIsProcessedByMe}"/>
+      </Annotations>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>
