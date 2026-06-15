@@ -1,5 +1,3 @@
-'use strict';
-
 const cds = require('@sap/cds');
 const { buildBuffer } = require('./lib/pdf-builder');
 
