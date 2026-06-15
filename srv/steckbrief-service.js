@@ -14,16 +14,18 @@ class SteckbriefService extends cds.ApplicationService {
           .where({ ID: req.params.id })
           .columns('*', { ref: ['finanzpositionen'], expand: ['*'] });
 
-        if (!data) return res.status(404).send('Not found');
+        if (!data) return res.status(404).send('Not Found');
 
         const buffer = await buildBuffer(data);
         const filename = `ZPROG_STECKBRIEF_${data.nummer || data.ID}.pdf`;
 
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.set({
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename="${filename}"`
+        });
+
         res.send(buffer);
       } catch (err) {
-        console.error(err);
         res.status(500).send('Internal Server Error');
       }
     });

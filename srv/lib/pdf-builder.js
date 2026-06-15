@@ -12,35 +12,33 @@ const printer = new PdfPrinter({
   },
 });
 
-const fmt = {
+const formatter = {
   date: (v) => v ? new Date(v).toLocaleDateString('de-DE') : '',
   bool: (v) => v ? 'J' : 'N',
 };
 
-const cell = (content, opts = {}) => ({
-  stack: Array.isArray(content) ? content : [content],
-  margin: [4, 4, 4, 4],
-  ...opts
-});
-
-const field = (label, value) => [
-  { text: label, bold: true, fontSize: 9 },
-  { text: value || '', fontSize: 10.5, margin: [0, 2, 0, 0] }
-];
+const ui = {
+  cell: (content, opts = {}) => ({ stack: Array.isArray(content) ? content : [content], margin: [4, 4, 4, 4], ...opts }),
+  labelValue: (label, value) => [
+    { text: label, bold: true, fontSize: 9 },
+    { text: value || '', fontSize: 10.5, margin: [0, 2, 0, 0] }
+  ],
+  sectionHeader: (text) => ({ table: { widths: ['*'], body: [[{ text, bold: true, fontSize: 10, margin: [4, 4, 4, 4] }]] }, margin: [0, 0, 0, 15] })
+};
 
 const buildDoc = (data) => ({
   pageSize: 'A4',
   pageMargins: [40, 45, 40, 45],
   defaultStyle: { font: 'Roboto', fontSize: 10.5, color: '#333' },
-  info: { title: 'ZPROG_STECKBRIEF_KLEIN', author: 'SAP' },
+  info: { title: 'ZPROG_STECKBRIEF_KLEIN', author: 'Project Engineering' },
   content: [
     { text: 'Steckbrief Förderprogramm', fontSize: 18, bold: true, margin: [0, 0, 0, 20] },
     {
       table: {
         widths: ['*', 130],
         body: [[
-          cell(field('Bezeichnung Förderprogramm (lang):', data.bezeichnungLang)),
-          cell(field('Stand:', fmt.date(data.stand)))
+          ui.cell(ui.labelValue('Bezeichnung Förderprogramm (lang):', data.bezeichnungLang)),
+          ui.cell(ui.labelValue('Stand:', formatter.date(data.stand)))
         ]]
       },
       margin: [0, 0, 0, 20]
@@ -50,8 +48,8 @@ const buildDoc = (data) => ({
         widths: ['*', 130],
         body: [
           [
-            cell(field('Bezeichnung Förderprogramm (kurz):', data.bezeichnungKurz)),
-            cell(field('Nummer:', data.nummer))
+            ui.cell(ui.labelValue('Bezeichnung Förderprogramm (kurz):', data.bezeichnungKurz)),
+            ui.cell(ui.labelValue('Nummer:', data.nummer))
           ],
           [
             { text: 'Ressort:', bold: true, fontSize: 9, margin: [4, 6, 4, 4] },
@@ -65,21 +63,15 @@ const buildDoc = (data) => ({
       },
       margin: [0, 0, 0, 20]
     },
-    {
-      table: {
-        widths: ['*'],
-        body: [[{ text: 'Handlungsfelder', bold: true, fontSize: 10, margin: [4, 4, 4, 4] }]]
-      },
-      margin: [0, 0, 0, 15]
-    },
+    ui.sectionHeader('Handlungsfelder'),
     ...[
-      { label: 'Inhalt:', key: 'inhalt' },
-      { label: 'Rechtsgrundlage:', key: 'rechtsgrundlage' },
-      { label: 'Adressat / Kunde:', key: 'adressat' },
-      { label: 'Zielsetzung:', key: 'zielsetzung' }
+      { l: 'Inhalt:', k: 'inhalt' },
+      { l: 'Rechtsgrundlage:', k: 'rechtsgrundlage' },
+      { l: 'Adressat / Kunde:', k: 'adressat' },
+      { l: 'Zielsetzung:', k: 'zielsetzung' }
     ].flatMap(s => [
-      { text: s.label, bold: true, fontSize: 10, margin: [0, 8, 0, 4] },
-      { text: data[s.key] || '', margin: [0, 0, 0, 12], lineHeight: 1.2 }
+      { text: s.l, bold: true, fontSize: 10, margin: [0, 8, 0, 4] },
+      { text: data[s.k] || '', margin: [0, 0, 0, 12], lineHeight: 1.2 }
     ]),
     { text: '', pageBreak: 'before' },
     {
@@ -95,7 +87,7 @@ const buildDoc = (data) => ({
             ['Finanzierungsart:', data.finanzierungsart],
             ['Form der Förderung:', data.foerderForm],
             ['Art der Förderung:', data.foerderArt],
-            ['Evaluation durchgeführt?:', fmt.bool(data.evaluationDurchgef)],
+            ['Evaluation durchgeführt?:', formatter.bool(data.evaluationDurchgef)],
           ].map(([l, v]) => [{ text: l, bold: true, margin: [4, 4, 4, 4] }, { text: v || '', margin: [4, 4, 4, 4] }])
         ]
       },
@@ -119,12 +111,16 @@ const buildDoc = (data) => ({
 });
 
 const buildBuffer = (data) => new Promise((resolve, reject) => {
-  const doc = printer.createPdfKitDocument(buildDoc(data));
-  const chunks = [];
-  doc.on('data', c => chunks.push(c));
-  doc.on('end', () => resolve(Buffer.concat(chunks)));
-  doc.on('error', reject);
-  doc.end();
+  try {
+    const doc = printer.createPdfKitDocument(buildDoc(data));
+    const chunks = [];
+    doc.on('data', c => chunks.push(c));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
+    doc.end();
+  } catch (err) {
+    reject(err);
+  }
 });
 
 module.exports = { buildBuffer };
