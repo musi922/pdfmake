@@ -17,143 +17,100 @@ const fmt = {
   bool: (v) => v ? 'J' : 'N',
 };
 
-const FIELDS = {
-  base: [
-    { label: 'Bezeichnung Förderprogramm (lang)', key: 'bezeichnungLang' },
-    { label: 'Stand', key: 'stand', fmt: fmt.date },
-    { label: 'Bezeichnung Förderprogramm (kurz)', key: 'bezeichnungKurz' },
-    { label: 'Nummer', key: 'nummer' },
-    { label: 'Ressort', key: 'ressort' },
-    { label: 'Zugeordnet zum Fachbereich', key: 'fachbereich' },
-  ],
-  handlungsfelder: [
-    { label: 'Inhalt', key: 'inhalt' },
-    { label: 'Rechtsgrundlage', key: 'rechtsgrundlage' },
-    { label: 'Adressat / Kunde', key: 'adressat' },
-    { label: 'Zielsetzung', key: 'zielsetzung' },
-  ],
-  weitereInfos: [
-    { label: 'Leistungsgrund', key: 'leistungsgrund' },
-    { label: 'Mittelherkunft', key: 'mittelherkunft' },
-    {
-      label: 'Bewilligungsbeginn und -ende', key: '_bewilligung',
-      fmt: (_, d) => `von: ${d.bewilligungBeginn ?? ''} bis: ${d.bewilligungEnde ?? ''}`
-    },
-    { label: 'Förderfrequenz', key: 'foerderfrequenz' },
-    { label: 'Finanzierungsart', key: 'finanzierungsart' },
-    { label: 'Form der Förderung', key: 'foerderForm' },
-    { label: 'Art der Förderung', key: 'foerderArt' },
-    { label: 'Evaluation durchgeführt?', key: 'evaluationDurchgef', fmt: fmt.bool },
-  ],
-};
+const cell = (content, opts = {}) => ({
+  stack: Array.isArray(content) ? content : [content],
+  margin: [4, 4, 4, 4],
+  ...opts
+});
 
-const lblVal = (label, value) => [
-  { text: label, bold: true, fontSize: 8 },
-  { text: value || '', fontSize: 9, margin: [0, 2, 0, 0] }
+const field = (label, value) => [
+  { text: label, bold: true, fontSize: 9 },
+  { text: value || '', fontSize: 10.5, margin: [0, 2, 0, 0] }
 ];
 
 const buildDoc = (data) => ({
   pageSize: 'A4',
-  pageMargins: [40, 40, 40, 40],
-  defaultStyle: { font: 'Roboto', fontSize: 9, color: '#333' },
-  info: {
-    title: 'ZPROG_STECKBRIEF',
-    author: 'SAP',
-  },
+  pageMargins: [40, 45, 40, 45],
+  defaultStyle: { font: 'Roboto', fontSize: 10.5, color: '#333' },
+  info: { title: 'ZPROG_STECKBRIEF_KLEIN', author: 'SAP' },
   content: [
-    { text: 'Steckbrief Förderprogramm', fontSize: 16, bold: true, margin: [0, 0, 0, 15] },
-
-    // Grid 1: Long Name and Stand
+    { text: 'Steckbrief Förderprogramm', fontSize: 18, bold: true, margin: [0, 0, 0, 20] },
     {
       table: {
-        widths: ['*', 120],
-        body: [
-          [
-            { stack: lblVal('Bezeichnung Förderprogramm (lang):', data.bezeichnungLang), margin: [2, 2, 2, 2] },
-            { stack: lblVal('Stand:', fmt.date(data.stand)), margin: [2, 2, 2, 2] }
-          ]
-        ]
+        widths: ['*', 130],
+        body: [[
+          cell(field('Bezeichnung Förderprogramm (lang):', data.bezeichnungLang)),
+          cell(field('Stand:', fmt.date(data.stand)))
+        ]]
       },
-      margin: [0, 0, 0, 15]
+      margin: [0, 0, 0, 20]
     },
-
-    // Grid 2: Short Name, Nummer, Ressort, Fachbereich
     {
       table: {
-        widths: ['*', 120],
+        widths: ['*', 130],
         body: [
           [
-            { stack: lblVal('Bezeichnung Förderprogramm (kurz):', data.bezeichnungKurz), margin: [2, 2, 2, 2] },
-            { stack: lblVal('Nummer:', data.nummer), margin: [2, 2, 2, 2] }
+            cell(field('Bezeichnung Förderprogramm (kurz):', data.bezeichnungKurz)),
+            cell(field('Nummer:', data.nummer))
           ],
           [
-            { text: 'Ressort:', bold: true, fontSize: 8, margin: [2, 5, 2, 2] },
-            { text: data.ressort || '', fontSize: 9, margin: [2, 5, 2, 2] }
+            { text: 'Ressort:', bold: true, fontSize: 9, margin: [4, 6, 4, 4] },
+            { text: data.ressort || '', fontSize: 10.5, margin: [4, 6, 4, 4] }
           ],
           [
-            { text: 'Zugeordnet zum Fachbereich:', bold: true, fontSize: 8, margin: [2, 5, 2, 2] },
-            { text: data.fachbereich || '', fontSize: 9, margin: [2, 5, 2, 2] }
+            { text: 'Zugeordnet zum Fachbereich:', bold: true, fontSize: 9, margin: [4, 6, 4, 4] },
+            { text: data.fachbereich || '', fontSize: 10.5, margin: [4, 6, 4, 4] }
           ]
-        ]
-      },
-      margin: [0, 0, 0, 15]
-    },
-
-    // Header: Handlungsfelder
-    {
-      table: {
-        widths: ['*'],
-        body: [[{ text: 'Handlungsfelder', bold: true, fontSize: 9, margin: [2, 2, 2, 2] }]]
-      },
-      margin: [0, 0, 0, 10]
-    },
-
-    // Text Content Sections
-    { text: 'Inhalt:', bold: true, fontSize: 9, margin: [0, 5, 0, 2] },
-    { text: data.inhalt || '', margin: [0, 0, 0, 10], leadingIndent: 0 },
-
-    { text: 'Rechtsgrundlage:', bold: true, fontSize: 9, margin: [0, 5, 0, 2] },
-    { text: data.rechtsgrundlage || '', margin: [0, 0, 0, 10] },
-
-    { text: 'Adressat / Kunde:', bold: true, fontSize: 9, margin: [0, 5, 0, 2] },
-    { text: data.adressat || '', margin: [0, 0, 0, 10] },
-
-    { text: 'Zielsetzung:', bold: true, fontSize: 9, margin: [0, 5, 0, 2] },
-    { text: data.zielsetzung || '', margin: [0, 0, 0, 10] },
-
-    // Page 2
-    { text: '', pageBreak: 'before' },
-
-    // Grid: Weitere Informationen
-    {
-      table: {
-        widths: ['35%', '*'],
-        body: [
-          [{ text: 'Weitere Informationen', bold: true, colSpan: 2, fillColor: '#f3f3f3', margin: [2, 2, 2, 2] }, {}],
-          [{ text: 'Leistungsgrund:', bold: true, margin: [2, 2, 2, 2] }, { text: data.leistungsgrund || '', margin: [2, 2, 2, 2] }],
-          [{ text: 'Mittelherkunft:', bold: true, margin: [2, 2, 2, 2] }, { text: data.mittelherkunft || '', margin: [2, 2, 2, 2] }],
-          [{ text: 'Bewilligungsbeginn und -ende:', bold: true, margin: [2, 2, 2, 2] }, { text: `von: ${data.bewilligungBeginn || ''} bis: ${data.bewilligungEnde || ''}`, margin: [2, 2, 2, 2] }],
-          [{ text: 'Förderfrequenz:', bold: true, margin: [2, 2, 2, 2] }, { text: data.foerderfrequenz || '', margin: [2, 2, 2, 2] }],
-          [{ text: 'Finanzierungsart:', bold: true, margin: [2, 2, 2, 2] }, { text: data.finanzierungsart || '', margin: [2, 2, 2, 2] }],
-          [{ text: 'Form der Förderung:', bold: true, margin: [2, 2, 2, 2] }, { text: data.foerderForm || '', margin: [2, 2, 2, 2] }],
-          [{ text: 'Art der Förderung:', bold: true, margin: [2, 2, 2, 2] }, { text: data.foerderArt || '', margin: [2, 2, 2, 2] }],
-          [{ text: 'Evaluation durchgeführt?:', bold: true, margin: [2, 2, 2, 2] }, { text: fmt.bool(data.evaluationDurchgef), margin: [2, 2, 2, 2] }],
         ]
       },
       margin: [0, 0, 0, 20]
     },
-
-    // Grid: Finanzpositionen
-    { text: 'Finanzpositionen:', bold: true, margin: [0, 10, 0, 5] },
     {
       table: {
-        widths: [100, '*'],
+        widths: ['*'],
+        body: [[{ text: 'Handlungsfelder', bold: true, fontSize: 10, margin: [4, 4, 4, 4] }]]
+      },
+      margin: [0, 0, 0, 15]
+    },
+    ...[
+      { label: 'Inhalt:', key: 'inhalt' },
+      { label: 'Rechtsgrundlage:', key: 'rechtsgrundlage' },
+      { label: 'Adressat / Kunde:', key: 'adressat' },
+      { label: 'Zielsetzung:', key: 'zielsetzung' }
+    ].flatMap(s => [
+      { text: s.label, bold: true, fontSize: 10, margin: [0, 8, 0, 4] },
+      { text: data[s.key] || '', margin: [0, 0, 0, 12], lineHeight: 1.2 }
+    ]),
+    { text: '', pageBreak: 'before' },
+    {
+      table: {
+        widths: ['35%', '*'],
+        body: [
+          [{ text: 'Weitere Informationen', bold: true, colSpan: 2, fillColor: '#f3f3f3', margin: [4, 4, 4, 4] }, {}],
+          ...[
+            ['Leistungsgrund:', data.leistungsgrund],
+            ['Mittelherkunft:', data.mittelherkunft],
+            ['Bewilligungsbeginn und -ende:', `von: ${data.bewilligungBeginn || ''} bis: ${data.bewilligungEnde || ''}`],
+            ['Förderfrequenz:', data.foerderfrequenz],
+            ['Finanzierungsart:', data.finanzierungsart],
+            ['Form der Förderung:', data.foerderForm],
+            ['Art der Förderung:', data.foerderArt],
+            ['Evaluation durchgeführt?:', fmt.bool(data.evaluationDurchgef)],
+          ].map(([l, v]) => [{ text: l, bold: true, margin: [4, 4, 4, 4] }, { text: v || '', margin: [4, 4, 4, 4] }])
+        ]
+      },
+      margin: [0, 0, 0, 25]
+    },
+    { text: 'Finanzpositionen:', bold: true, margin: [0, 15, 0, 8], fontSize: 10.5 },
+    {
+      table: {
+        widths: [120, '*'],
         headerRows: 1,
         body: [
-          [{ text: 'Nummer', bold: true, alignment: 'center', margin: [2, 2, 2, 2] }, { text: 'Bezeichnung', bold: true, alignment: 'center', margin: [2, 2, 2, 2] }],
+          [{ text: 'Nummer', bold: true, alignment: 'center', margin: [4, 4, 4, 4] }, { text: 'Bezeichnung', bold: true, alignment: 'center', margin: [4, 4, 4, 4] }],
           ...(data.finanzpositionen || []).map(f => [
-            { text: f.nummer || '', alignment: 'center', margin: [2, 2, 2, 2] },
-            { text: f.bezeichnung || '', margin: [2, 2, 2, 2] }
+            { text: f.nummer || '', alignment: 'center', margin: [4, 4, 4, 4] },
+            { text: f.bezeichnung || '', margin: [4, 4, 4, 4] }
           ])
         ]
       }

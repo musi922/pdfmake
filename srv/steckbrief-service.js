@@ -8,18 +8,24 @@ class SteckbriefService extends cds.ApplicationService {
     const { Foerderprogramme } = this.entities;
 
     cds.app.get('/pdf/:id', async (req, res) => {
-      const data = await SELECT.one
-        .from(Foerderprogramme)
-        .where({ ID: req.params.id })
-        .columns('*', { ref: ['finanzpositionen'], expand: ['*'] });
+      try {
+        const data = await SELECT.one
+          .from(Foerderprogramme)
+          .where({ ID: req.params.id })
+          .columns('*', { ref: ['finanzpositionen'], expand: ['*'] });
 
-      if (!data) return res.status(404).send('Not found');
+        if (!data) return res.status(404).send('Not found');
 
-      const buffer = await buildBuffer(data);
-      res.setHeader('Content-Type', 'application/pdf');
-      const filename = `ZPROG_STECKBRIEF_${data.nummer || data.ID}.pdf`;
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      res.send(buffer);
+        const buffer = await buildBuffer(data);
+        const filename = `ZPROG_STECKBRIEF_${data.nummer || data.ID}.pdf`;
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.send(buffer);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error');
+      }
     });
 
     return super.init();
