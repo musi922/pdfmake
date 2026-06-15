@@ -17,7 +17,8 @@ class SteckbriefService extends cds.ApplicationService {
 
       const buffer = await buildBuffer(data);
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="steckbrief-${data.nummer ?? req.params.id}.pdf"`);
+      const filename = `ZPROG_STECKBRIEF_${data.nummer || data.ID}.pdf`;
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       res.send(buffer);
     });
 
